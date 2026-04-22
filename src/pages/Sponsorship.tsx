@@ -63,7 +63,7 @@ export default function Sponsorship() {
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/80 border-b border-cyan-100/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <img src="/logo.svg" alt="logo" className="h-12 w-auto" />
+            <img src="/logo.png" alt="logo" className="h-12 w-auto" />
             <div className="hidden sm:block leading-tight">
               <div className="font-bold text-sm gradient-text">Particles Without Borders</div>
               <div className="text-[10px] text-muted-foreground tracking-wide uppercase">KLCC · 16 Nov 2026</div>

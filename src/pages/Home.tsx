@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 
-const logoUrl = "/logo.svg";
+const logoUrl = "/logo.png";
 const klccBg = "/klcc-bg.svg";
-const particlesPlusLogo: string | undefined = undefined;
-const upmLogo: string | undefined = undefined;
+const particlesPlusLogo = "/particles-plus-logo.png";
+const upmLogo = "/upm-logo.png";
 
 const NAV = [
   { id: "home", label: "Home" },
@@ -463,27 +463,67 @@ function Sponsors() {
   return (
     <Section id="sponsors" kicker="Sponsors & Partners" title="Powering the conversation.">
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
-        {SPONSORS.map((s, i) => (
-          <div key={i} className="bg-white p-6 rounded-2xl border border-cyan-100 shadow-sm flex items-center gap-4">
-            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tierClass[s.tier]} flex items-center justify-center text-white font-extrabold text-lg shadow`}>
-              {s.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
-            </div>
-            <div>
-              <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">{s.tier} Sponsor</div>
-              <div className="font-bold">{s.name}</div>
-            </div>
-          </div>
-        ))}
+        {SPONSORS.map((s, i) => {
+          const inner = (
+            <>
+              {s.logo ? (
+                <div className="w-16 h-16 rounded-xl bg-white border border-cyan-100 flex items-center justify-center p-1.5 shadow">
+                  <img src={s.logo} alt={s.name} className="max-h-full max-w-full object-contain" />
+                </div>
+              ) : (
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tierClass[s.tier]} flex items-center justify-center text-white font-extrabold text-lg shadow`}>
+                  {s.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                </div>
+              )}
+              <div>
+                <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">{s.tier} Sponsor</div>
+                <div className="font-bold">{s.name}</div>
+                {s.url && (
+                  <div className="text-xs text-primary mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Visit website →
+                  </div>
+                )}
+              </div>
+            </>
+          );
+          const cardClass =
+            "group bg-white p-6 rounded-2xl border border-cyan-100 shadow-sm flex items-center gap-4 transition-all";
+          return s.url ? (
+            <a
+              key={i}
+              href={s.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={`Visit ${s.name}`}
+              className={`${cardClass} hover:shadow-xl hover:-translate-y-0.5 hover:border-primary cursor-pointer`}
+            >
+              {inner}
+            </a>
+          ) : (
+            <div key={i} className={cardClass}>{inner}</div>
+          );
+        })}
       </div>
 
       <div>
         <h3 className="text-2xl font-bold mb-5">Partners</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {PARTNERS.map((p, i) => (
-            <div key={i} className="aspect-[3/2] bg-white border border-cyan-100 rounded-xl shadow-sm flex items-center justify-center p-4 text-center text-sm font-semibold text-foreground/80 hover:shadow-md transition" title={p.name}>
-              {p.logo ? <img src={p.logo} alt={p.name} className="max-h-full max-w-full object-contain" /> : p.name}
-            </div>
-          ))}
+          {PARTNERS.map((p, i) => {
+            const body = p.logo ? (
+              <img src={p.logo} alt={p.name} className="max-h-full max-w-full object-contain" />
+            ) : (
+              p.name
+            );
+            const cls =
+              "aspect-[3/2] bg-white border border-cyan-100 rounded-xl shadow-sm flex items-center justify-center p-4 text-center text-sm font-semibold text-foreground/80 hover:shadow-md hover:border-primary transition";
+            return p.url ? (
+              <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" title={`Visit ${p.name}`} className={cls}>
+                {body}
+              </a>
+            ) : (
+              <div key={i} className={cls} title={p.name}>{body}</div>
+            );
+          })}
         </div>
       </div>
 
