@@ -216,7 +216,7 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden">
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${klccBg})` }} />
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/55 via-slate-900/40 to-emerald-950/50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
       <Particles />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center w-full">
