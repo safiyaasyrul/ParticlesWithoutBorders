@@ -242,7 +242,7 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
           <div className="absolute inset-0 bg-gradient-radial from-white/60 via-white/20 to-transparent blur-3xl" />
                       <div
                         className="float-anim relative bg-white/95 backdrop-blur rounded-3xl shadow-2xl border border-white/50 flex items-center justify-center"
-                        style={{ width: "300px", height: "300px" }}
+                        style={{ width: "400px", height: "300px" }}
                       >
                       <img  
                         src={logoUrl} 
