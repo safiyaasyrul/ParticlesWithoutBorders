@@ -241,13 +241,13 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
         <div className="relative flex justify-center items-center">
           <div className="absolute inset-0 bg-gradient-radial from-white/60 via-white/20 to-transparent blur-3xl" />
                       <div
-                        className="float-anim relative bg-white/95 backdrop-blur rounded-3xl shadow-2xl border border-white/50 flex items-center justify-center"
+                        className="float-anim relative bg-white/90 backdrop-blur rounded-3xl shadow-2xl border border-white/50 flex items-center justify-center"
                         style={{ width: "400px", height: "300px" }}
                       >
                       <img  
                         src={logoUrl} 
                         alt="Particles Without Borders Logo"
-                        className="w-full h-full object-contain p-8"
+                        className="w-full h-full object-contain p-4"
                   />
               </div>
           </div>
