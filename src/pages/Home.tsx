@@ -127,8 +127,8 @@ function Particles() {
       {items.map((_, i) => {
         const size = 3 + Math.random() * 16;
         const left = Math.random() * 100;
-        const dur = 10 + Math.random() * 22;
-        const delay = Math.random() * 18;
+        const dur = 6 + Math.random() * 12;
+        const delay = Math.random() * 2;
         const drift = (Math.random() * 60 - 30).toFixed(1);
         const opacity = 0.35 + Math.random() * 0.55;
         const blur = Math.random() < 0.3 ? "blur(1px)" : "none";
@@ -852,10 +852,10 @@ export default function Home() {
       <main>
         <Hero onNav={handleNav} />
         <About />
-        <Organizers />
         <CallForPapers />
         <Registration />
         <Dates />
+        <Organizers />
         <Sponsors />
         <Contact />
       </main>
