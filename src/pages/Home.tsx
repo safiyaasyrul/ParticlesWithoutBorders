@@ -249,7 +249,8 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
               </div>
           </div>
         </div>
-        </section>
+    
+    </section>
   );
 }
 
