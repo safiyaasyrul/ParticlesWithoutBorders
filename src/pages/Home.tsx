@@ -240,12 +240,16 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
         </div>
         <div className="relative flex justify-center items-center">
           <div className="absolute inset-0 bg-gradient-radial from-white/60 via-white/20 to-transparent blur-3xl" />
-          <div className="relative bg-white/95 backdrop-blur rounded-[2rem] p-8 sm:p-12 shadow-2xl border border-white/50 float-anim">
-            <img src={logoUrl} alt="Particles Without Borders Logo" className="w-full max-w-sm sm:max-w-md mx-auto h-auto" />
+                <div className="relative p-4 sm:p-6 float-anim">
+                  <img 
+                    src={logoUrl} 
+                    alt="Particles Without Borders Logo" 
+                    className="w-full max-w-[220px] sm:max-w-[260px] mx-auto h-auto opacity-95" 
+                  />
+              </div>
           </div>
         </div>
-      </div>
-    </section>
+        </section>
   );
 }
 
@@ -853,8 +857,8 @@ export default function Home() {
         <Hero onNav={handleNav} />
         <About />
         <CallForPapers />
+         <Dates />
         <Registration />
-        <Dates />
         <Organizers />
         <Sponsors />
         <Contact />
