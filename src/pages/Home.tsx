@@ -125,6 +125,9 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
               {n.label}
             </button>
           ))}
+          <Link href="/organizer" className="px-3 py-2 rounded-full text-sm font-medium text-foreground hover:bg-cyan-50">
+            Organizer
+          </Link>
           <Link href="/sponsorship" className="px-3 py-2 rounded-full text-sm font-medium text-foreground hover:bg-cyan-50">
             Sponsorship
           </Link>
@@ -142,6 +145,9 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
               {n.label}
             </button>
           ))}
+          <Link href="/organizer" className="text-left px-4 py-2 rounded-md hover:bg-cyan-50 text-sm font-medium" onClick={() => setOpen(false)}>
+            Organizer
+          </Link>
           <Link href="/sponsorship" className="text-left px-4 py-2 rounded-md hover:bg-cyan-50 text-sm font-medium" onClick={() => setOpen(false)}>
             Sponsorship
           </Link>

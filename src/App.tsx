@@ -1,12 +1,14 @@
 import { Route, Switch } from "wouter";
 import Home from "./pages/Home";
 import Sponsorship from "./pages/Sponsorship";
+import Organizer from "./pages/Organizer";
 
 export default function App() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/sponsorship" component={Sponsorship} />
+      <Route path="/organizer" component={Organizer} />
       <Route>
         <div className="min-h-screen flex items-center justify-center text-foreground">
           <div className="text-center">
