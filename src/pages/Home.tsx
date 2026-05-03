@@ -313,12 +313,17 @@ function RegistrationForm({ tier, setTier }: { tier: string; setTier: (t: string
   const [error, setError] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [subRole, setSubRole] = useState<"presenter" | "listener">("presenter");
+  const [selectedTheme, setSelectedTheme] = useState<string>("");
   const [abstractFileName, setAbstractFileName] = useState<string>("");
   const [studentIdFileName, setStudentIdFileName] = useState<string>("");
   const selected = TIERS.find((t) => t.key === tier) ?? TIERS[0];
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (tier === "presenter" && subRole === "presenter" && !selectedTheme) {
+      setError("Please select a conference theme for your paper.");
+      return;
+    }
     setError(null);
     setSubmitting(true);
     const f = new FormData(e.currentTarget);
@@ -406,6 +411,49 @@ function RegistrationForm({ tier, setTier }: { tier: string; setTier: (t: string
               </div>
               {subRole === "presenter" && (
                 <>
+                  <div>
+                    <label className="text-sm font-semibold mb-1 block">
+                      Conference Theme <span className="text-destructive">*</span>
+                    </label>
+                    <p className="text-xs text-muted-foreground mb-3">Select the theme that best matches your paper.</p>
+                    <div className="space-y-2">
+                      {THEMES.map((theme, i) => {
+                        const icons = ["🫁", "🏠", "🌫️", "📡", "🏭"];
+                        const isSelected = selectedTheme === theme;
+                        return (
+                          <button
+                            type="button"
+                            key={i}
+                            onClick={() => setSelectedTheme(theme)}
+                            className={`w-full text-left flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${
+                              isSelected
+                                ? "border-primary bg-primary/5 shadow-sm"
+                                : "border-cyan-100 bg-white hover:border-cyan-300"
+                            }`}
+                          >
+                            <span className="text-xl mt-0.5 flex-shrink-0">{icons[i]}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className={`text-sm font-semibold leading-snug ${isSelected ? "text-primary" : "text-foreground"}`}>
+                                Theme {i + 1}
+                              </div>
+                              <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{theme}</div>
+                            </div>
+                            <div className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 transition-all ${isSelected ? "border-primary bg-primary" : "border-slate-300"}`}>
+                              {isSelected && (
+                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <input type="hidden" name="theme" value={selectedTheme} />
+                    {!selectedTheme && (
+                      <p className="text-xs text-destructive mt-2">Please select a theme to continue.</p>
+                    )}
+                  </div>
                   <Field label="Paper title" name="paperTitle" required />
                   <Field label="Keywords (comma separated)" name="keywords" required />
                   <div>
@@ -427,7 +475,6 @@ function RegistrationForm({ tier, setTier }: { tier: string; setTier: (t: string
             </div>
           )}
 
-          <SelectField label="Conference Theme" name="theme" required options={THEMES} />
           <Field label="Dietary Requirements" name="dietary" placeholder="e.g. vegetarian, halal, allergies" />
           <div className="grid sm:grid-cols-2 gap-5">
             <SelectField label="Visa Required?" name="visa" required options={["No", "Yes"]} />
