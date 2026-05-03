@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 
 const logoUrl = "/logo.png";
-const klccBg = "/klcc-bg.svg";
+const klccBg = "/klcc-bg.png";
 const particlesPlusLogo = "/particles-plus-logo.png";
 const upmLogo = "/upm-logo.png";
 const northumbriaLogo = "/northumbria-logo.jpg";
@@ -132,9 +132,7 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
               {n.label}
             </button>
           ))}
-          <Link href="/organizer" className="px-3 py-2 rounded-full text-sm font-medium text-foreground hover:bg-cyan-50">
-            Organizer
-          </Link>
+         
           <Link href="/sponsorship" className="px-3 py-2 rounded-full text-sm font-medium text-foreground hover:bg-cyan-50">
             Sponsorship
           </Link>
@@ -152,9 +150,7 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
               {n.label}
             </button>
           ))}
-          <Link href="/organizer" className="text-left px-4 py-2 rounded-md hover:bg-cyan-50 text-sm font-medium" onClick={() => setOpen(false)}>
-            Organizer
-          </Link>
+          
           <Link href="/sponsorship" className="text-left px-4 py-2 rounded-md hover:bg-cyan-50 text-sm font-medium" onClick={() => setOpen(false)}>
             Sponsorship
           </Link>
@@ -167,9 +163,9 @@ function Header({ active, onNav }: { active: string; onNav: (id: string) => void
 function Hero({ onNav }: { onNav: (id: string) => void }) {
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden">
-      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${klccBg})` }} />
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/70 via-teal-800/60 to-emerald-700/70" />
-      <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/40 to-transparent" />
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${klccBg})` }} />
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/55 via-slate-900/40 to-emerald-950/50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
       <Particles />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center w-full">
         <div className="text-white fade-in">
