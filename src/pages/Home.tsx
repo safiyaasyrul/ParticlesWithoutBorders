@@ -10,10 +10,10 @@ const northumbriaLogo = "/northumbria-logo.jpg";
 const NAV = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
-  { id: "organizers", label: "Organizers" },
   { id: "papers", label: "Call for Papers" },
-  { id: "registration", label: "Registration" },
   { id: "dates", label: "Important Dates" },
+  { id: "registration", label: "Registration" },
+  { id: "organizers", label: "Organizers" },
   { id: "sponsors", label: "Sponsors" },
 ];
 
