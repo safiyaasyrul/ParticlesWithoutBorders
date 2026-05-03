@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 
+type Organizer = { role: string; name: string; logo?: string; url?: string };
+const ORGANIZERS: Organizer[] = [
+  { role: "Lead Organiser", name: "Particles Plus", logo: particlesPlusLogo, url: "https://www.particlesplus.com" },
+  { role: "Academic Partner & Co-Organiser", name: "Universiti Putra Malaysia", logo: upmLogo, url: "https://www.upm.edu.my" },
+  { role: "Research Partner & Co-Organiser", name: "Northumbria University", logo: northumbriaLogo, url: "https://www.northumbria.ac.uk" },
+];
 const logoUrl = "/logo.png";
 const klccBg = "/klcc-bg.svg";
 const particlesPlusLogo = "/particles-plus-logo.png";
 const upmLogo = "/upm-logo.png";
+const northumbriaLogo = "/northumbria-logo.png";
 
 const NAV = [
   { id: "home", label: "Home" },
@@ -226,7 +233,13 @@ function About() {
     </Section>
   );
 }
-
+<main>
+  <Hero onNav={handleNav} />
+  <About />
+  <Organizers />      {/* ← add this */}
+  <CallForPapers />
+  ...
+</main>
 function CallForPapers() {
   return (
     <Section id="papers" kicker="Call for Papers" title="Conference themes.">
@@ -459,7 +472,38 @@ function Field({ label, name, type = "text", required, placeholder }: { label: s
     </div>
   );
 }
-
+function Organizers() {
+  return (
+    <Section id="organizers" kicker="Organised By" title="Meet the organizers.">
+      <div className="grid sm:grid-cols-3 gap-6">
+        {ORGANIZERS.map((o, i) => {
+          const card = (
+            <div className="group bg-white p-8 rounded-2xl border border-cyan-100 shadow-sm flex flex-col items-center text-center gap-5 hover:shadow-xl hover:-translate-y-1 transition-all">
+              <div className="w-20 h-20 rounded-xl bg-slate-50 border border-cyan-100 flex items-center justify-center p-2 shadow-sm">
+                {o.logo
+                  ? <img src={o.logo} alt={o.name} className="max-h-full max-w-full object-contain" />
+                  : <span className="text-lg font-bold text-primary">{o.name.split(" ").map(w => w[0]).join("").slice(0, 3)}</span>
+                }
+              </div>
+              <div>
+                <div className="font-bold text-lg mb-1">{o.name}</div>
+                <div className="text-sm text-muted-foreground">{o.role}</div>
+              </div>
+              {o.url && (
+                <div className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  Visit website →
+                </div>
+              )}
+            </div>
+          );
+          return o.url
+            ? <a key={i} href={o.url} target="_blank" rel="noopener noreferrer" className="block">{card}</a>
+            : <div key={i} key={i}>{card}</div>;
+        })}
+      </div>
+    </Section>
+  );
+}
 function Sponsors() {
   const tierClass: Record<string, string> = {
     Gold: "from-amber-400 to-yellow-500",

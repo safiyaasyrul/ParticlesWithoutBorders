@@ -39,11 +39,7 @@ const SPONSORS = [
 
 type Partner = { name: string; logo?: string };
 const PARTNERS: Partner[] = [
-  {
-    name: "Universiti Putra Malaysia",
-    logo: upmLogo,
-    url: "https://www.upm.edu.my",
-  },
+  
   { name: "Asian Institute of Technology" },
   { name: "WHO Collaborating Centre" },
   { name: "ASEAN Clean Air Network" },
