@@ -13,6 +13,7 @@ const NAV = [
   { id: "papers", label: "Call for Papers" },
   { id: "registration", label: "Registration" },
   { id: "dates", label: "Important Dates" },
+  { id: "organizers", label: "Organizers" },
   { id: "sponsors", label: "Sponsors" },
   { id: "contact", label: "Contact" },
 ];
