@@ -108,11 +108,11 @@ export default function Organizer() {
                 rel="noopener noreferrer"
                 className="group flex flex-col p-8 rounded-2xl border-2 border-cyan-100 bg-gradient-to-br from-white to-cyan-50/40 shadow-sm hover:shadow-xl hover:border-primary hover:-translate-y-1 transition-all"
               >
-                <div className="h-24 flex items-center justify-start mb-6">
+                <div className="h-40 flex items-center justify-center mb-6 bg-slate-50 rounded-xl border border-cyan-100 p-4">
                   <img
                     src={org.logo}
                     alt={org.name}
-                    className="max-h-full max-w-[180px] object-contain"
+                    className="max-h-full max-w-full object-contain"
                   />
                 </div>
                 <div className="flex-1">

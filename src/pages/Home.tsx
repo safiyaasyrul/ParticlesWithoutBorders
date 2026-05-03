@@ -522,10 +522,10 @@ function Organizers() {
         {ORGANIZERS.map((o, i) => {
           const card = (
             <div className="group bg-white p-8 rounded-2xl border border-cyan-100 shadow-sm flex flex-col items-center text-center gap-5 hover:shadow-xl hover:-translate-y-1 transition-all">
-              <div className="w-20 h-20 rounded-xl bg-slate-50 border border-cyan-100 flex items-center justify-center p-2 shadow-sm">
+              <div className="w-48 h-32 rounded-2xl bg-slate-50 border border-cyan-100 flex items-center justify-center p-4 shadow-sm">
                 {o.logo
                   ? <img src={o.logo} alt={o.name} className="max-h-full max-w-full object-contain" />
-                  : <span className="text-lg font-bold text-primary">{o.name.split(" ").map(w => w[0]).join("").slice(0, 3)}</span>
+                  : <span className="text-2xl font-bold text-primary">{o.name.split(" ").map(w => w[0]).join("").slice(0, 3)}</span>
                 }
               </div>
               <div>
