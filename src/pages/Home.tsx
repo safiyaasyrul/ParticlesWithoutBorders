@@ -1,17 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 
-type Organizer = { role: string; name: string; logo?: string; url?: string };
-const ORGANIZERS: Organizer[] = [
-  { role: "Lead Organiser", name: "Particles Plus", logo: particlesPlusLogo, url: "https://www.particlesplus.com" },
-  { role: "Academic Partner & Co-Organiser", name: "Universiti Putra Malaysia", logo: upmLogo, url: "https://www.upm.edu.my" },
-  { role: "Research Partner & Co-Organiser", name: "Northumbria University", logo: northumbriaLogo, url: "https://www.northumbria.ac.uk" },
-];
 const logoUrl = "/logo.png";
 const klccBg = "/klcc-bg.svg";
 const particlesPlusLogo = "/particles-plus-logo.png";
 const upmLogo = "/upm-logo.png";
-const northumbriaLogo = "/northumbria-logo.png";
+const northumbriaLogo = "/northumbria-logo.jpg";
 
 const NAV = [
   { id: "home", label: "Home" },
@@ -31,9 +25,15 @@ const THEMES = [
   "Characterisation of Air Pollution Sources and Emissions Using Advanced Monitoring Technologies",
 ];
 
+type Organizer = { role: string; name: string; logo: string; url: string };
+const ORGANIZERS: Organizer[] = [
+  { role: "Lead Organiser", name: "Particles Plus", logo: particlesPlusLogo, url: "https://www.particlesplus.com" },
+  { role: "Academic Co-Organiser", name: "Universiti Putra Malaysia", logo: upmLogo, url: "https://www.upm.edu.my" },
+  { role: "Research Co-Organiser", name: "Northumbria University Newcastle", logo: northumbriaLogo, url: "https://www.northumbria.ac.uk" },
+];
+
 type Sponsor = { tier: string; name: string; logo?: string; url?: string };
 const SPONSORS: Sponsor[] = [
-  { tier: "Gold", name: "Particles Plus", logo: particlesPlusLogo, url: "https://www.particlesplus.com" },
   { tier: "Gold", name: "GreenFleet Maritime" },
   { tier: "Silver", name: "EcoMonitor Asia" },
   { tier: "Silver", name: "Petronas Research" },
@@ -43,7 +43,6 @@ const SPONSORS: Sponsor[] = [
 
 type Partner = { name: string; logo?: string; url?: string };
 const PARTNERS: Partner[] = [
-  { name: "Universiti Putra Malaysia", logo: upmLogo, url: "https://www.upm.edu.my" },
   { name: "Asian Institute of Technology" },
   { name: "WHO Collaborating Centre" },
   { name: "ASEAN Clean Air Network" },
@@ -233,13 +232,7 @@ function About() {
     </Section>
   );
 }
-<main>
-  <Hero onNav={handleNav} />
-  <About />
-  <Organizers />      {/* ← add this */}
-  <CallForPapers />
-  ...
-</main>
+
 function CallForPapers() {
   return (
     <Section id="papers" kicker="Call for Papers" title="Conference themes.">
@@ -498,7 +491,7 @@ function Organizers() {
           );
           return o.url
             ? <a key={i} href={o.url} target="_blank" rel="noopener noreferrer" className="block">{card}</a>
-            : <div key={i} key={i}>{card}</div>;
+            : <div key={i}>{card}</div>;
         })}
       </div>
     </Section>
@@ -674,6 +667,7 @@ export default function Home() {
       <main>
         <Hero onNav={handleNav} />
         <About />
+        <Organizers />
         <CallForPapers />
         <Registration />
         <Dates />
