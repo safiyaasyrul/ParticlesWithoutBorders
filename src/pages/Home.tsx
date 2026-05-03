@@ -67,12 +67,59 @@ const DATES = [
   { date: "16 Nov 2026", label: "Conference Day — KLCC, Kuala Lumpur" },
 ];
 
-type Tier = { key: string; name: string; early: string; regular: string; perks: string[]; highlight?: boolean };
-const TIERS: Tier[] = [
-  { key: "industry", name: "Industry / Participant", early: "MYR 400", regular: "MYR 500", perks: ["Full conference access", "Lunch & coffee breaks", "Conference kit & e-certificate", "Networking dinner"] },
-  { key: "presenter", name: "Presenter", early: "MYR 200", regular: "MYR 250", highlight: true, perks: ["Oral / poster presentation slot", "Full conference access", "Publications", "Lunch, coffee & networking dinner"] },
-  { key: "student", name: "Student", early: "MYR 100", regular: "MYR 150", perks: ["Full conference access", "Publications", "E-certificate", "Lunch & coffee breaks"] },
+type Category = "industry" | "academic" | "student";
+type Role = "presenter" | "listener";
+
+type CategoryConfig = {
+  key: Category;
+  name: string;
+  icon: string;
+  desc: string;
+  perks: string[];
+  hasListener: boolean;
+  presenterFee: { early: string; regular: string };
+  listenerFee?: { early: string; regular: string };
+  requireUniEmail?: boolean;
+};
+
+const CATEGORIES: CategoryConfig[] = [
+  {
+    key: "industry",
+    name: "Industry",
+    icon: "🏭",
+    desc: "Professionals from industry, government and non-academic organisations.",
+    perks: ["Full conference access", "Lunch & coffee breaks", "Conference kit & e-certificate", "Networking dinner"],
+    hasListener: true,
+    presenterFee: { early: "MYR 400", regular: "MYR 500" },
+    listenerFee:  { early: "MYR 320", regular: "MYR 400" },
+  },
+  {
+    key: "academic",
+    name: "Academician",
+    icon: "🎓",
+    desc: "Faculty, researchers and staff of recognised academic or research institutions. Institutional email required.",
+    perks: ["Full conference access", "Lunch & coffee breaks", "Conference kit & e-certificate", "Networking dinner", "Publications access"],
+    hasListener: true,
+    presenterFee: { early: "MYR 200", regular: "MYR 250" },
+    listenerFee:  { early: "MYR 160", regular: "MYR 200" },
+    requireUniEmail: true,
+  },
+  {
+    key: "student",
+    name: "Student",
+    icon: "🎒",
+    desc: "Full-time students at recognised institutions. Student ID and abstract submission required.",
+    perks: ["Full conference access", "Presentation slot", "Publications", "E-certificate", "Lunch & coffee breaks"],
+    hasListener: false,
+    presenterFee: { early: "MYR 100", regular: "MYR 150" },
+  },
 ];
+
+const FREE_EMAIL_DOMAINS = ["gmail.com","yahoo.com","hotmail.com","outlook.com","live.com","icloud.com","me.com","aol.com","ymail.com","proton.me","protonmail.com"];
+function isUniEmail(email: string) {
+  const domain = email.split("@")[1]?.toLowerCase() ?? "";
+  return domain.length > 0 && !FREE_EMAIL_DOMAINS.includes(domain);
+}
 
 function Particles() {
   const items = Array.from({ length: 70 });
@@ -254,9 +301,46 @@ function CallForPapers() {
 
 type RegistrationTab = "fees" | "register";
 
+function ThemeCards({ selectedTheme, setSelectedTheme }: { selectedTheme: string; setSelectedTheme: (t: string) => void }) {
+  const icons = ["🫁", "🏠", "🌫️", "📡", "🏭"];
+  return (
+    <div>
+      <label className="text-sm font-semibold mb-1 block">Conference Theme <span className="text-destructive">*</span></label>
+      <p className="text-xs text-muted-foreground mb-3">Select the theme that best matches your paper.</p>
+      <div className="space-y-2">
+        {THEMES.map((theme, i) => {
+          const isSelected = selectedTheme === theme;
+          return (
+            <button type="button" key={i} onClick={() => setSelectedTheme(theme)}
+              className={`w-full text-left flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${isSelected ? "border-primary bg-primary/5 shadow-sm" : "border-cyan-100 bg-white hover:border-cyan-300"}`}>
+              <span className="text-xl mt-0.5 flex-shrink-0">{icons[i]}</span>
+              <div className="flex-1 min-w-0">
+                <div className={`text-sm font-semibold leading-snug ${isSelected ? "text-primary" : "text-foreground"}`}>Theme {i + 1}</div>
+                <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{theme}</div>
+              </div>
+              <div className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 transition-all ${isSelected ? "border-primary bg-primary" : "border-slate-300"}`}>
+                {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <input type="hidden" name="theme" value={selectedTheme} />
+      {!selectedTheme && <p className="text-xs text-destructive mt-2">Please select a theme to continue.</p>}
+    </div>
+  );
+}
+
 function Registration() {
   const [tab, setTab] = useState<RegistrationTab>("fees");
-  const [tier, setTier] = useState<string>("presenter");
+  const [initCategory, setInitCategory] = useState<Category>("academic");
+  const [initRole, setInitRole] = useState<Role>("presenter");
+
+  function jumpToRegister(cat: Category, role: Role) {
+    setInitCategory(cat);
+    setInitRole(role);
+    setTab("register");
+  }
 
   return (
     <Section id="registration" kicker="Registration & Submission" title="Join us in Kuala Lumpur.">
@@ -270,86 +354,133 @@ function Registration() {
         <div>
           <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-emerald-100 text-emerald-800 text-sm font-semibold">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Early Bird ends 30 September 2026 — save up to 25%
+            Early Bird ends 30 September 2026 — save up to 20%
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {TIERS.map((t) => (
-              <div key={t.key} className={`relative p-7 rounded-2xl border-2 transition-all flex flex-col ${t.highlight ? "border-primary bg-gradient-to-br from-cyan-50 to-emerald-50 shadow-2xl scale-[1.02]" : "border-cyan-100 bg-white shadow-sm hover:shadow-lg"}`}>
-                {t.highlight && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider">Most popular</div>}
-                <h3 className="text-2xl font-bold mb-1">{t.name}</h3>
-                <div className="text-sm text-muted-foreground mb-5">Conference fee per delegate</div>
-                <div className="mb-1">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-extrabold gradient-text">{t.early}</span>
-                    <span className="text-sm text-muted-foreground">early bird</span>
+            {CATEGORIES.map((cat) => (
+              <div key={cat.key} className={`relative p-7 rounded-2xl border-2 transition-all flex flex-col ${cat.key === "academic" ? "border-primary bg-gradient-to-br from-cyan-50 to-emerald-50 shadow-2xl scale-[1.02]" : "border-cyan-100 bg-white shadow-sm hover:shadow-lg"}`}>
+                {cat.key === "academic" && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider">Most popular</div>}
+                <div className="text-3xl mb-3">{cat.icon}</div>
+                <h3 className="text-2xl font-bold mb-1">{cat.name}</h3>
+                <p className="text-xs text-muted-foreground mb-5 leading-relaxed">{cat.desc}</p>
+
+                <div className="space-y-3 mb-5">
+                  <div className="p-3 rounded-xl bg-white/70 border border-cyan-100">
+                    <div className="text-xs font-bold uppercase tracking-wider text-primary mb-1">Presenter</div>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-2xl font-extrabold gradient-text">{cat.presenterFee.early}</span>
+                      <span className="text-xs text-muted-foreground">early bird</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground line-through">{cat.presenterFee.regular} regular</div>
+                    <div className="text-xs text-slate-500 mt-1">Submit abstract + choose theme</div>
                   </div>
-                  <div className="text-sm text-muted-foreground line-through mt-1">{t.regular} regular</div>
+                  {cat.hasListener && cat.listenerFee && (
+                    <div className="p-3 rounded-xl bg-white/70 border border-cyan-100">
+                      <div className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-1">Listener</div>
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-2xl font-extrabold text-emerald-600">{cat.listenerFee.early}</span>
+                        <span className="text-xs text-muted-foreground">early bird</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground line-through">{cat.listenerFee.regular} regular</div>
+                      <div className="text-xs text-slate-500 mt-1">Attend sessions, no presentation</div>
+                    </div>
+                  )}
                 </div>
-                <ul className="mt-6 space-y-2.5 flex-1">
-                  {t.perks.map((p, i) => (
+
+                <ul className="space-y-2 flex-1 mb-5">
+                  {cat.perks.map((p, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <svg className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                      <svg className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       <span>{p}</span>
                     </li>
                   ))}
+                  {cat.requireUniEmail && (
+                    <li className="flex items-start gap-2 text-sm text-amber-700">
+                      <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      <span>Institutional email required</span>
+                    </li>
+                  )}
                 </ul>
-                <button onClick={() => { setTier(t.key); setTab("register"); }} className={`mt-6 w-full py-3 rounded-full font-semibold transition-all ${t.highlight ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-foreground text-background hover:opacity-90"}`}>Select &amp; Register</button>
+
+                <div className="space-y-2">
+                  <button onClick={() => jumpToRegister(cat.key, "presenter")}
+                    className={`w-full py-2.5 rounded-full text-sm font-semibold transition-all ${cat.key === "academic" ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-foreground text-background hover:opacity-90"}`}>
+                    Register as Presenter
+                  </button>
+                  {cat.hasListener && (
+                    <button onClick={() => jumpToRegister(cat.key, "listener")}
+                      className="w-full py-2.5 rounded-full text-sm font-semibold border-2 border-current transition-all hover:bg-slate-50">
+                      Register as Listener
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {tab === "register" && <RegistrationForm tier={tier} setTier={setTier} />}
+      {tab === "register" && <RegistrationForm initCategory={initCategory} initRole={initRole} />}
     </Section>
   );
 }
 
-function RegistrationForm({ tier, setTier }: { tier: string; setTier: (t: string) => void }) {
+function RegistrationForm({ initCategory, initRole }: { initCategory: Category; initRole: Role }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
-  const [subRole, setSubRole] = useState<"presenter" | "listener">("presenter");
+  const [category, setCategory] = useState<Category>(initCategory);
+  const [role, setRole] = useState<Role>(initRole);
   const [selectedTheme, setSelectedTheme] = useState<string>("");
   const [abstractFileName, setAbstractFileName] = useState<string>("");
   const [studentIdFileName, setStudentIdFileName] = useState<string>("");
-  const selected = TIERS.find((t) => t.key === tier) ?? TIERS[0];
+  const [emailVal, setEmailVal] = useState("");
+
+  const cat = CATEGORIES.find((c) => c.key === category)!;
+  const isPresenter = category === "student" || role === "presenter";
+  const fee = role === "listener" && cat.listenerFee ? cat.listenerFee : cat.presenterFee;
+  const showUniWarning = cat.requireUniEmail && emailVal.length > 3 && !isUniEmail(emailVal);
+
+  function handleCategoryChange(c: Category) {
+    setCategory(c);
+    const newCat = CATEGORIES.find((x) => x.key === c)!;
+    if (!newCat.hasListener) setRole("presenter");
+    setSelectedTheme("");
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (tier === "presenter" && subRole === "presenter" && !selectedTheme) {
+    if (isPresenter && !selectedTheme) {
       setError("Please select a conference theme for your paper.");
+      return;
+    }
+    if (cat.requireUniEmail && !isUniEmail(emailVal)) {
+      setError("Academician registration requires an institutional email address (not Gmail, Yahoo, etc.).");
       return;
     }
     setError(null);
     setSubmitting(true);
     const f = new FormData(e.currentTarget);
-    const isPresenter = tier === "presenter";
-    const isStudent = tier === "student";
     const payload: Record<string, unknown> = {
-      category: selected.name,
+      category: `${cat.name} — ${isPresenter ? "Presenter" : "Listener"}`,
       name: f.get("name"),
       email: f.get("email"),
       affiliation: f.get("affiliation"),
       country: f.get("country"),
-      theme: f.get("theme"),
+      theme: selectedTheme,
+      subRole: isPresenter ? "presenter" : "listener",
       dietary: f.get("dietary") ?? "",
       visa: f.get("visa"),
       reviewer: f.get("reviewer"),
-      paymentStatus: f.get("paymentStatus"),
+      paymentStatus: "Pending",
     };
     if (isPresenter) {
-      payload.subRole = subRole;
-      if (subRole === "presenter") {
-        payload.paperTitle = f.get("paperTitle");
-        payload.keywords = f.get("keywords");
-        payload.abstractFile = abstractFileName;
-      }
+      payload.paperTitle = f.get("paperTitle");
+      payload.keywords = f.get("keywords");
+      payload.abstractFile = abstractFileName;
     }
-    if (isStudent) payload.studentIdFile = studentIdFileName;
+    if (category === "student") payload.studentIdFile = studentIdFileName;
     try {
       const res = await fetch("/api/registrations", {
         method: "POST",
@@ -368,13 +499,11 @@ function RegistrationForm({ tier, setTier }: { tier: string; setTier: (t: string
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl bg-white p-8 rounded-2xl border border-cyan-100 shadow-sm space-y-5">
+    <form onSubmit={handleSubmit} className="max-w-3xl bg-white p-8 rounded-2xl border border-cyan-100 shadow-sm space-y-6">
       {submitted ? (
         <div className="text-center py-10">
           <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
+            <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
           </div>
           <h3 className="text-2xl font-bold mb-2">Registration successful</h3>
           <p className="text-muted-foreground">An invoice and payment instructions will arrive in your inbox shortly.</p>
@@ -382,111 +511,118 @@ function RegistrationForm({ tier, setTier }: { tier: string; setTier: (t: string
         </div>
       ) : (
         <>
+          {/* Step 1: Category */}
           <div>
-            <label className="text-sm font-semibold mb-2 block">Participant category</label>
+            <label className="text-sm font-semibold mb-3 block">1. Participant category</label>
             <div className="grid sm:grid-cols-3 gap-2">
-              {TIERS.map((t) => (
-                <button type="button" key={t.key} onClick={() => setTier(t.key)} className={`p-3 rounded-xl text-sm font-semibold border-2 transition-all text-left ${tier === t.key ? "border-primary bg-primary/5" : "border-cyan-100 hover:border-cyan-300"}`}>
-                  <div>{t.name}</div>
-                  <div className="text-xs font-normal text-muted-foreground mt-0.5">{t.early} early bird</div>
+              {CATEGORIES.map((c) => (
+                <button type="button" key={c.key} onClick={() => handleCategoryChange(c.key)}
+                  className={`p-4 rounded-xl text-sm font-semibold border-2 transition-all text-left ${category === c.key ? "border-primary bg-primary/5" : "border-cyan-100 hover:border-cyan-300"}`}>
+                  <div className="text-xl mb-1">{c.icon}</div>
+                  <div>{c.name}</div>
+                  <div className="text-xs font-normal text-muted-foreground mt-0.5">{c.presenterFee.early} presenter</div>
                 </button>
               ))}
             </div>
           </div>
-          <Field label="Full name" name="name" required />
-          <Field label="Email" name="email" type="email" required />
-          <Field label="Affiliation / Institution" name="affiliation" required />
-          <Field label="Country" name="country" required />
 
-          {tier === "presenter" && (
-            <div className="p-5 rounded-xl border-2 border-cyan-100 bg-cyan-50/40 space-y-5">
-              <div>
-                <label className="text-sm font-semibold mb-2 block">Attending as</label>
-                <div className="grid grid-cols-2 gap-2 p-1.5 bg-white rounded-full border border-cyan-100">
-                  {(["presenter", "listener"] as const).map((r) => (
-                    <button type="button" key={r} onClick={() => setSubRole(r)} className={`py-2 rounded-full text-sm font-semibold capitalize transition-all ${subRole === r ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>{r}</button>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">{subRole === "presenter" ? "You will present an oral or poster paper. Please submit your abstract below." : "You will attend sessions without presenting."}</p>
+          {/* Step 2: Role (Industry / Academic only) */}
+          {cat.hasListener && (
+            <div>
+              <label className="text-sm font-semibold mb-3 block">2. Attending as</label>
+              <div className="grid grid-cols-2 gap-3">
+                {(["presenter", "listener"] as Role[]).map((r) => {
+                  const roleFee = r === "listener" && cat.listenerFee ? cat.listenerFee : cat.presenterFee;
+                  return (
+                    <button type="button" key={r} onClick={() => { setRole(r); setSelectedTheme(""); }}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${role === r ? "border-primary bg-primary/5" : "border-cyan-100 hover:border-cyan-300"}`}>
+                      <div className="font-semibold capitalize text-sm">{r}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        {r === "presenter" ? "Submit abstract + choose theme" : "Attend sessions, no presentation"}
+                      </div>
+                      <div className="text-sm font-bold gradient-text mt-1">{roleFee.early} <span className="text-xs font-normal text-muted-foreground">early bird</span></div>
+                    </button>
+                  );
+                })}
               </div>
-              {subRole === "presenter" && (
-                <>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">
-                      Conference Theme <span className="text-destructive">*</span>
-                    </label>
-                    <p className="text-xs text-muted-foreground mb-3">Select the theme that best matches your paper.</p>
-                    <div className="space-y-2">
-                      {THEMES.map((theme, i) => {
-                        const icons = ["🫁", "🏠", "🌫️", "📡", "🏭"];
-                        const isSelected = selectedTheme === theme;
-                        return (
-                          <button
-                            type="button"
-                            key={i}
-                            onClick={() => setSelectedTheme(theme)}
-                            className={`w-full text-left flex items-start gap-3 p-4 rounded-xl border-2 transition-all ${
-                              isSelected
-                                ? "border-primary bg-primary/5 shadow-sm"
-                                : "border-cyan-100 bg-white hover:border-cyan-300"
-                            }`}
-                          >
-                            <span className="text-xl mt-0.5 flex-shrink-0">{icons[i]}</span>
-                            <div className="flex-1 min-w-0">
-                              <div className={`text-sm font-semibold leading-snug ${isSelected ? "text-primary" : "text-foreground"}`}>
-                                Theme {i + 1}
-                              </div>
-                              <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{theme}</div>
-                            </div>
-                            <div className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 transition-all ${isSelected ? "border-primary bg-primary" : "border-slate-300"}`}>
-                              {isSelected && (
-                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <input type="hidden" name="theme" value={selectedTheme} />
-                    {!selectedTheme && (
-                      <p className="text-xs text-destructive mt-2">Please select a theme to continue.</p>
-                    )}
-                  </div>
-                  <Field label="Paper title" name="paperTitle" required />
-                  <Field label="Keywords (comma separated)" name="keywords" required />
-                  <div>
-                    <label className="text-sm font-semibold mb-2 block">Abstract upload (PDF / DOC / DOCX) <span className="text-destructive">*</span></label>
-                    <input type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setAbstractFileName(e.target.files?.[0]?.name ?? "")} className="block w-full text-sm file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:bg-primary file:text-primary-foreground file:font-semibold hover:file:opacity-90" />
-                    {abstractFileName && <p className="text-xs text-muted-foreground mt-1.5">Selected: {abstractFileName}</p>}
-                  </div>
-                </>
+            </div>
+          )}
+
+          {/* Step 3: Personal details */}
+          <div className="space-y-4">
+            <label className="text-sm font-semibold block">{cat.hasListener ? "3." : "2."} Your details</label>
+            <Field label="Full name" name="name" required />
+            <div>
+              <label className="text-sm font-semibold mb-2 block" htmlFor="email">
+                Email {cat.requireUniEmail && <span className="text-amber-600 font-normal text-xs ml-1">(institutional email required)</span>} <span className="text-destructive">*</span>
+              </label>
+              <input id="email" name="email" type="email" required value={emailVal} onChange={(e) => setEmailVal(e.target.value)}
+                className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition ${showUniWarning ? "border-amber-400 bg-amber-50" : "border-input bg-background"}`} />
+              {showUniWarning && (
+                <p className="text-xs text-amber-700 mt-1.5 flex items-center gap-1">
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Please use your institutional email (e.g. @upm.edu.my, @northumbria.ac.uk)
+                </p>
               )}
             </div>
-          )}
+            <Field label="Affiliation / Institution" name="affiliation" required />
+            <Field label="Country" name="country" required />
+          </div>
 
-          {tier === "student" && (
+          {/* Student ID upload — always for students */}
+          {category === "student" && (
             <div className="p-5 rounded-xl border-2 border-cyan-100 bg-cyan-50/40 space-y-3">
-              <label className="text-sm font-semibold block">Student ID card upload (PDF / JPG / PNG) <span className="text-destructive">*</span></label>
-              <p className="text-xs text-muted-foreground -mt-1">A clear scan or photo of your valid student ID is required to qualify for the student fee.</p>
-              <input type="file" accept=".pdf,image/*" required onChange={(e) => setStudentIdFileName(e.target.files?.[0]?.name ?? "")} className="block w-full text-sm file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:bg-primary file:text-primary-foreground file:font-semibold hover:file:opacity-90" />
-              {studentIdFileName && <p className="text-xs text-muted-foreground">Selected: {studentIdFileName}</p>}
+              <label className="text-sm font-semibold block">Student ID verification <span className="text-destructive">*</span></label>
+              <p className="text-xs text-muted-foreground">Upload a clear scan or photo of your valid student ID card (PDF / JPG / PNG).</p>
+              <input type="file" accept=".pdf,image/*" required onChange={(e) => setStudentIdFileName(e.target.files?.[0]?.name ?? "")}
+                className="block w-full text-sm file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:bg-primary file:text-primary-foreground file:font-semibold hover:file:opacity-90" />
+              {studentIdFileName && <p className="text-xs text-emerald-600 font-medium">✓ Selected: {studentIdFileName}</p>}
             </div>
           )}
 
-          <Field label="Dietary Requirements" name="dietary" placeholder="e.g. vegetarian, halal, allergies" />
-          <div className="grid sm:grid-cols-2 gap-5">
-            <SelectField label="Visa Required?" name="visa" required options={["No", "Yes"]} />
-            <SelectField label="Willing to be Reviewer?" name="reviewer" required options={["No", "Yes"]} />
-          </div>
-          <SelectField label="Payment Status" name="paymentStatus" required options={["Pending", "Paid"]} />
+          {/* Presenter fields — shown when presenting */}
+          {isPresenter && (
+            <div className="p-5 rounded-xl border-2 border-primary/20 bg-primary/5 space-y-5">
+              <div className="flex items-center gap-2 mb-1">
+                <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                <span className="text-sm font-bold">Abstract submission</span>
+              </div>
+              <ThemeCards selectedTheme={selectedTheme} setSelectedTheme={setSelectedTheme} />
+              <Field label="Paper title" name="paperTitle" required />
+              <Field label="Keywords (comma separated)" name="keywords" required />
+              <div>
+                <label className="text-sm font-semibold mb-2 block">Abstract upload (PDF / DOC / DOCX) <span className="text-destructive">*</span></label>
+                <input type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setAbstractFileName(e.target.files?.[0]?.name ?? "")}
+                  className="block w-full text-sm file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:bg-primary file:text-primary-foreground file:font-semibold hover:file:opacity-90" />
+                {abstractFileName && <p className="text-xs text-emerald-600 font-medium mt-1.5">✓ Selected: {abstractFileName}</p>}
+              </div>
+            </div>
+          )}
 
-          <div className="p-4 rounded-xl bg-accent text-accent-foreground text-sm">
-            <strong>Selected:</strong> {selected.name} · <strong>{selected.early}</strong> early bird ({selected.regular} regular)
+          {/* Other fields */}
+          <div className="space-y-4">
+            <Field label="Dietary Requirements" name="dietary" placeholder="e.g. vegetarian, halal, allergies" />
+            <div className="grid sm:grid-cols-2 gap-4">
+              <SelectField label="Visa invitation letter required?" name="visa" required options={["No", "Yes"]} />
+              <SelectField label="Willing to be a reviewer?" name="reviewer" required options={["No", "Yes"]} />
+            </div>
           </div>
-          {error && <div className="p-3 rounded-xl bg-red-50 text-red-700 text-sm">{error}</div>}
-          <button type="submit" disabled={submitting} className="px-8 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 disabled:opacity-60">
+
+          {/* Summary */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-50 to-emerald-50 border border-cyan-200 text-sm flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <div className="font-bold">{cat.name} — {isPresenter ? "Presenter" : "Listener"}</div>
+              <div className="text-muted-foreground text-xs mt-0.5">Early Bird deadline: 30 September 2026</div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-extrabold gradient-text">{fee.early}</div>
+              <div className="text-xs text-muted-foreground line-through">{fee.regular} regular</div>
+            </div>
+          </div>
+
+          {error && <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
+          <button type="submit" disabled={submitting}
+            className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 disabled:opacity-60 transition-colors">
             {submitting ? "Submitting…" : "Complete Registration"}
           </button>
         </>
