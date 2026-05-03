@@ -2,6 +2,7 @@ import { Route, Switch } from "wouter";
 import Home from "./pages/Home";
 import Sponsorship from "./pages/Sponsorship";
 import Organizer from "./pages/Organizer";
+import Programme from "./pages/Programme";
 
 export default function App() {
   return (
@@ -9,6 +10,7 @@ export default function App() {
       <Route path="/" component={Home} />
       <Route path="/sponsorship" component={Sponsorship} />
       <Route path="/organizer" component={Organizer} />
+      <Route path="/programme" component={Programme} />
       <Route>
         <div className="min-h-screen flex items-center justify-center text-foreground">
           <div className="text-center">
