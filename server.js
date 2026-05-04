@@ -3,6 +3,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import pg from "pg";
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -265,6 +267,40 @@ app.post("/api/admin/registrations/:id/custom-email", adminAuth, async (req, res
   } catch (err) {
     console.error(err);
     res.status(500).json({ ok: false, error: "Failed to send custom email" });
+  }
+});
+
+// ── Admin: send confirmation email via Resend ─────────────────────────────────
+
+app.post("/api/admin/send-confirmation", adminAuth, async (req, res) => {
+  try {
+    const { email, name, title } = req.body;
+
+    if (!email || !name) {
+      return res.status(400).json({ ok: false, error: "Email and name are required" });
+    }
+
+    console.log("Admin sending confirmation to:", email);
+
+    const result = await resend.emails.send({
+      from: "Particles Without Borders <scientific@particleswithoutborders.com>",
+      to: email,
+      subject: "Submission Confirmation – Particles Without Borders 2026",
+      html: `
+        <p>Dear ${name},</p>
+        <p>We are pleased to inform you that your submission:</p>
+        <p><strong>${title || "Your abstract"}</strong></p>
+        <p>has been successfully received and is currently under review.</p>
+        <br/>
+        <p>Regards,<br/>Secretariat<br/>Particles Without Borders 2026</p>
+      `,
+    });
+
+    console.log("Confirmation email sent:", result);
+    res.status(200).json({ ok: true, result });
+  } catch (err) {
+    console.error("Admin confirmation email error:", err);
+    res.status(500).json({ ok: false, error: "Failed to send confirmation email" });
   }
 });
 
