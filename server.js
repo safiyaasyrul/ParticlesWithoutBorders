@@ -174,7 +174,11 @@ app.post("/api/registrations", async (req, res) => {
        b.keywords ?? "", b.dietary ?? "", b.visa ?? "", b.reviewer ?? "",
        b.paymentStatus ?? "Pending"]
     );
-    res.status(200).json({ success: true, id });
+    res.status(200).json({
+      success: true,
+      id,
+      registration: { id }
+    });
   } catch (err) {
     console.error("Registration error:", err);
     res.status(500).json({ success: false, error: "Registration failed" });
