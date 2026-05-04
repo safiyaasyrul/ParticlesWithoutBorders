@@ -4,7 +4,7 @@ Build a full backend system for my conference website (React frontend already ex
    Create POST /api/registrations:
 
 * Accept JSON payload:
-  name, title, email, affiliation, country, category, subRole (presenter/listener), theme, paperTitle, keywords, dietary, visa, reviewer
+  name, email, affiliation, country, category, subRole (presenter/listener), theme, paperTitle, keywords, dietary, visa, reviewer
 * Save into database table "registrations"
 * Add fields:
   id (auto), created_at, payment_status ("Pending"), invoice_id (nullable)

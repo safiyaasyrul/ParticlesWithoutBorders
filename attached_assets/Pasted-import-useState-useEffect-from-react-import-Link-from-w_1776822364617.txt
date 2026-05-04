@@ -267,12 +267,12 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${klccBg})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/70 via-teal-800/60 to-emerald-700/70" />
+     <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/75 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/40 to-transparent" />
       <Particles />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center w-full">
-        <div className="text-white fade-in">
+       <div className="text-slate-900 fade-in bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm max-w-xl">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur border border-white/30 text-xs font-medium uppercase tracking-wider mb-6">
             <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
             16 November 2026 · KLCC, Kuala Lumpur
@@ -284,10 +284,10 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
               Without Borders
             </span>
           </h1>
-          <p className="text-xl sm:text-2xl font-light italic mb-4 text-cyan-50">
+          <p className="text-xl sm:text-2xl font-light italic mb-4 text-slate-600">
             Air Quality, Health &amp; Sustainable Solutions
           </p>
-          <p className="text-base sm:text-lg text-white/90 max-w-xl mb-8 leading-relaxed">
+          <p className="text-base sm:text-lg text-slate-700 max-w-xl mb-8 leading-relaxed">
             An international gathering of scientists, engineers and policymakers
             advancing the understanding of particles, emissions and sustainable
             solutions for cleaner air and healthier communities.

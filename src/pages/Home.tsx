@@ -224,7 +224,7 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             16 November 2026 · KLCC, Kuala Lumpur
           </div>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-5 text-slate-900">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-5 tracking-tight">
             Particles<br />
             <span className="bg-gradient-to-r from-emerald-300 to-cyan-200 bg-clip-text text-transparent">Without Borders</span>
           </h1>
