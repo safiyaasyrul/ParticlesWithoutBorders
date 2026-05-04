@@ -511,6 +511,7 @@ function RegistrationForm({ initCategory, initRole }: { initCategory: Category; 
           </div>
           <h3 className="text-2xl font-bold mb-2">Registration successful</h3>
           <p className="text-muted-foreground">An invoice and payment instructions will arrive in your inbox shortly.</p>
+          <p className="mt-3 text-sm text-emerald-700 font-medium">Your submission is under review. Notification will be sent via email.</p>
           {savedId && <p className="mt-3 text-xs text-muted-foreground font-mono">Reference: {savedId}</p>}
         </div>
       ) : (

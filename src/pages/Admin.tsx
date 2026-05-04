@@ -18,6 +18,7 @@ type Reg = {
   visa: string;
   reviewer: string;
   payment_status: string;
+  review_status: string;
   status: string;
   invoice_sent: boolean;
   decision_sent: boolean;
@@ -27,13 +28,13 @@ type Reg = {
 type EmailPreview = { subject: string; html: string } | null;
 
 const STATUS_CFG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-  pending:  { label: "Pending",  bg: "bg-amber-50",   text: "text-amber-700",  dot: "bg-amber-400" },
-  accepted: { label: "Accepted", bg: "bg-emerald-50", text: "text-emerald-700",dot: "bg-emerald-500" },
-  rejected: { label: "Rejected", bg: "bg-red-50",     text: "text-red-700",    dot: "bg-red-400" },
+  Pending:  { label: "Pending",  bg: "bg-amber-50",   text: "text-amber-700",  dot: "bg-amber-400" },
+  Accepted: { label: "Accepted", bg: "bg-emerald-50", text: "text-emerald-700",dot: "bg-emerald-500" },
+  Rejected: { label: "Rejected", bg: "bg-red-50",     text: "text-red-700",    dot: "bg-red-400" },
 };
 
 function Badge({ status }: { status: string }) {
-  const cfg = STATUS_CFG[status] ?? STATUS_CFG.pending;
+  const cfg = STATUS_CFG[status] ?? STATUS_CFG.Pending;
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
@@ -120,33 +121,32 @@ function RowActions({
 
   return (
     <div className="flex flex-wrap gap-1.5 justify-end">
-      {isPresenter && reg.status === "pending" && (
-        <>
-          <button
-            disabled={!!loading}
-            onClick={() => callApi(`/api/admin/registrations/${reg.id}/decision`, { decision: "accepted" })}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-colors"
-          >
-            {loading === `/api/admin/registrations/${reg.id}/decision` ? "…" : "✓ Accept"}
-          </button>
-          <button
-            disabled={!!loading}
-            onClick={() => callApi(`/api/admin/registrations/${reg.id}/decision`, { decision: "rejected" })}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50 transition-colors"
-          >
-            {loading ? "…" : "✕ Reject"}
-          </button>
-        </>
-      )}
-      {isPresenter && reg.status !== "pending" && reg.decision_sent && (
-        <button
-          disabled={!!loading}
-          onClick={() => callApi(`/api/admin/registrations/${reg.id}/decision`, { decision: reg.status })}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-50 transition-colors"
-        >
-          Resend decision
-        </button>
-      )}
+      <button
+        disabled={!!loading}
+        onClick={() => callApi(`/api/admin/registrations/${reg.id}/decision`, { decision: "Accepted" })}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-colors"
+      >
+        {loading === `/api/admin/registrations/${reg.id}/decision` ? "…" : "Accept Paper"}
+      </button>
+      <button
+        disabled={!!loading}
+        onClick={() => callApi(`/api/admin/registrations/${reg.id}/decision`, { decision: "Rejected" })}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50 transition-colors"
+      >
+        {loading ? "…" : "Reject Paper"}
+      </button>
+      <button
+        disabled={!!loading}
+        onClick={() => {
+          const subject = prompt("Custom email subject");
+          const message = prompt("Custom email message");
+          if (!subject || !message) return;
+          callApi(`/api/admin/registrations/${reg.id}/custom-email`, { subject, message });
+        }}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50 transition-colors"
+      >
+        Send Custom Email
+      </button>
       <button
         disabled={!!loading}
         onClick={() => callApi(`/api/admin/registrations/${reg.id}/invoice`, {})}
@@ -181,7 +181,7 @@ export default function Admin() {
   const [loginError, setLoginError] = useState("");
   const [registrations, setRegistrations] = useState<Reg[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState<"all" | "pending" | "accepted" | "rejected">("all");
+  const [filter, setFilter] = useState<"all" | "Pending" | "Accepted" | "Rejected">("all");
   const [search, setSearch] = useState("");
   const [emailPreview, setEmailPreview] = useState<EmailPreview>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -223,7 +223,7 @@ export default function Admin() {
   }
 
   const filtered = registrations.filter((r) => {
-    if (filter !== "all" && r.status !== filter) return false;
+    if (filter !== "all" && r.review_status !== filter) return false;
     if (search) {
       const q = search.toLowerCase();
       return r.name.toLowerCase().includes(q) || r.email.toLowerCase().includes(q) || r.id.toLowerCase().includes(q) || (r.paper_title ?? "").toLowerCase().includes(q);
@@ -233,9 +233,9 @@ export default function Admin() {
 
   const counts = {
     all: registrations.length,
-    pending: registrations.filter((r) => r.status === "pending").length,
-    accepted: registrations.filter((r) => r.status === "accepted").length,
-    rejected: registrations.filter((r) => r.status === "rejected").length,
+    pending: registrations.filter((r) => r.review_status === "Pending").length,
+    accepted: registrations.filter((r) => r.review_status === "Accepted").length,
+    rejected: registrations.filter((r) => r.review_status === "Rejected").length,
     invoiced: registrations.filter((r) => r.invoice_sent).length,
   };
 
@@ -336,7 +336,7 @@ export default function Admin() {
           {/* Toolbar */}
           <div className="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
             <div className="flex gap-1 flex-wrap">
-              {(["all", "pending", "accepted", "rejected"] as const).map((f) => (
+              {(["all", "Pending", "Accepted", "Rejected"] as const).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
@@ -344,7 +344,7 @@ export default function Admin() {
                     filter === f ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-slate-100"
                   }`}
                 >
-                  {f} {f === "all" ? `(${counts.all})` : f === "pending" ? `(${counts.pending})` : f === "accepted" ? `(${counts.accepted})` : `(${counts.rejected})`}
+                  {f} {f === "all" ? `(${counts.all})` : f === "Pending" ? `(${counts.pending})` : f === "Accepted" ? `(${counts.accepted})` : `(${counts.rejected})`}
                 </button>
               ))}
             </div>
@@ -397,7 +397,7 @@ export default function Admin() {
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Delegate</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap hidden md:table-cell">Category</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap hidden lg:table-cell">Abstract</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Status</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Review Status</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap hidden sm:table-cell">Invoice</th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Actions</th>
                   </tr>
@@ -427,7 +427,7 @@ export default function Admin() {
                           )}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <Badge status={reg.status || "pending"} />
+                          <Badge status={reg.review_status || "Pending"} />
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap hidden sm:table-cell">
                           {reg.invoice_sent ? (
@@ -471,6 +471,7 @@ export default function Admin() {
                               <div>
                                 <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Admin</div>
                                 <div><span className="text-muted-foreground">Payment:</span> {reg.payment_status || "—"}</div>
+                                <div><span className="text-muted-foreground">Review:</span> {reg.review_status || "Pending"}</div>
                                 <div><span className="text-muted-foreground">Decision sent:</span> {reg.decision_sent ? "Yes" : "No"}</div>
                                 <div><span className="text-muted-foreground">Invoice sent:</span> {reg.invoice_sent ? "Yes" : "No"}</div>
                                 <div><span className="text-muted-foreground">Registered:</span> {new Date(reg.created_at).toLocaleString()}</div>

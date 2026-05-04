@@ -26,12 +26,14 @@ async function ensureSchema() {
       visa           TEXT,
       reviewer       TEXT,
       payment_status TEXT DEFAULT 'Pending',
+      review_status  TEXT DEFAULT 'Pending',
       status         TEXT DEFAULT 'pending',
       invoice_sent   BOOLEAN DEFAULT FALSE,
       decision_sent  BOOLEAN DEFAULT FALSE,
       created_at     TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+  await pool.query(`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS review_status TEXT DEFAULT 'Pending'`).catch(() => {});
   await pool.query(`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending'`).catch(() => {});
   await pool.query(`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS invoice_sent BOOLEAN DEFAULT FALSE`).catch(() => {});
   await pool.query(`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS decision_sent BOOLEAN DEFAULT FALSE`).catch(() => {});
@@ -53,61 +55,50 @@ function makeTransport() {
 
 function acceptanceEmail(reg) {
   return {
-    subject: `[Particles Without Borders 2026] Abstract Accepted — ${reg.paper_title || "Your Submission"}`,
+    subject: "Paper Acceptance Notification",
     html: `
-<!DOCTYPE html><html><body style="font-family:sans-serif;color:#1a1a1a;max-width:600px;margin:auto;padding:24px">
-<div style="background:linear-gradient(135deg,#0e7490,#059669);padding:32px;border-radius:16px 16px 0 0;text-align:center">
-  <h1 style="color:#fff;margin:0;font-size:26px">Particles Without Borders 2026</h1>
-  <p style="color:#a7f3d0;margin:8px 0 0">16 November 2026 · KLCC, Kuala Lumpur</p>
-</div>
-<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:0 0 16px 16px;padding:32px">
-  <div style="font-size:40px;text-align:center;margin-bottom:16px">🎉</div>
-  <h2 style="color:#065f46;margin-top:0">Congratulations, ${reg.name}!</h2>
-  <p>We are delighted to inform you that your abstract submission has been <strong style="color:#059669">accepted</strong> for presentation at Particles Without Borders 2026.</p>
-  <div style="background:#fff;border:1px solid #d1fae5;border-radius:12px;padding:20px;margin:20px 0">
-    <p style="margin:0 0 8px"><strong>Reference ID:</strong> ${reg.id}</p>
-    <p style="margin:0 0 8px"><strong>Abstract title:</strong> ${reg.paper_title || "—"}</p>
-    <p style="margin:0 0 8px"><strong>Conference theme:</strong> ${reg.theme || "—"}</p>
-    <p style="margin:0"><strong>Presenter:</strong> ${reg.name} · ${reg.affiliation || ""}</p>
-  </div>
-  <p><strong>Next steps:</strong></p>
-  <ul>
-    <li>Please ensure your conference registration fee is paid by <strong>31 October 2026</strong>.</li>
-    <li>Full paper submission (if applicable) is due by <strong>15 October 2026</strong>.</li>
-    <li>Presentation guidelines will be sent separately closer to the event.</li>
-  </ul>
-  <p>We look forward to welcoming you to Kuala Lumpur.</p>
-  <p style="color:#6b7280;font-size:13px;margin-top:32px;border-top:1px solid #d1fae5;padding-top:16px">
-    Particles Without Borders 2026 · KLCC, Kuala Lumpur · <a href="mailto:info@particleswithoutborders.com">info@particleswithoutborders.com</a>
-  </p>
-</div>
-</body></html>`,
+Dear ${reg.name},
+
+We are pleased to inform you that your paper titled:
+'${reg.paper_title || "Your Submission"}'
+has been ACCEPTED for presentation at Particles Without Borders 2026.
+
+Further details regarding presentation schedule and registration will follow.
+
+Thank you for your contribution.
+
+Secretariat
+Particles Without Borders`,
   };
 }
 
 function rejectionEmail(reg) {
   return {
-    subject: `[Particles Without Borders 2026] Abstract Submission Update — ${reg.paper_title || "Your Submission"}`,
+    subject: "Paper Submission Outcome",
     html: `
-<!DOCTYPE html><html><body style="font-family:sans-serif;color:#1a1a1a;max-width:600px;margin:auto;padding:24px">
-<div style="background:linear-gradient(135deg,#0e7490,#059669);padding:32px;border-radius:16px 16px 0 0;text-align:center">
-  <h1 style="color:#fff;margin:0;font-size:26px">Particles Without Borders 2026</h1>
-  <p style="color:#a7f3d0;margin:8px 0 0">16 November 2026 · KLCC, Kuala Lumpur</p>
-</div>
-<div style="background:#fff;border:1px solid #e5e7eb;border-radius:0 0 16px 16px;padding:32px">
-  <h2 style="color:#1a1a1a;margin-top:0">Dear ${reg.name},</h2>
-  <p>Thank you for submitting your abstract to Particles Without Borders 2026. After careful review by our scientific committee, we regret to inform you that your submission was not selected for presentation at this edition of the conference.</p>
-  <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin:20px 0">
-    <p style="margin:0 0 8px"><strong>Reference ID:</strong> ${reg.id}</p>
-    <p style="margin:0"><strong>Abstract title:</strong> ${reg.paper_title || "—"}</p>
-  </div>
-  <p>We received a large number of high-quality submissions this year and the selection process was highly competitive. We encourage you to consider attending as a delegate and submitting to future editions of the conference.</p>
-  <p>Thank you again for your interest in Particles Without Borders.</p>
-  <p style="color:#6b7280;font-size:13px;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:16px">
-    Particles Without Borders 2026 · KLCC, Kuala Lumpur · <a href="mailto:info@particleswithoutborders.com">info@particleswithoutborders.com</a>
-  </p>
-</div>
-</body></html>`,
+Dear ${reg.name},
+
+Thank you for your submission to Particles Without Borders 2026.
+
+After careful review, we regret to inform you that your paper was not selected for presentation.
+
+We appreciate your interest and hope to see your participation in future events.
+
+Secretariat
+Particles Without Borders`,
+  };
+}
+
+function customEmail({ name, subject, message }) {
+  return {
+    subject,
+    html: `
+Dear ${name},
+
+${message}
+
+Secretariat
+Particles Without Borders`,
   };
 }
 
@@ -180,7 +171,7 @@ app.post("/api/registrations", async (req, res) => {
        b.keywords ?? "", b.dietary ?? "", b.visa ?? "", b.reviewer ?? "",
        b.paymentStatus ?? "Pending"]
     );
-    res.json({ ok: true, registration: { id } });
+    res.json({ ok: true, success: true, registration: { id }, id });
   } catch (err) {
     console.error("Registration error:", err);
     res.status(500).json({ ok: false, error: "Registration failed. Please try again." });
@@ -201,9 +192,7 @@ function adminAuth(req, res, next) {
 
 app.get("/api/admin/registrations", adminAuth, async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT * FROM registrations ORDER BY created_at DESC`
-    );
+    const { rows } = await pool.query(`SELECT * FROM registrations ORDER BY created_at DESC`);
     res.json({ ok: true, registrations: rows });
   } catch (err) {
     console.error(err);
@@ -216,17 +205,17 @@ app.get("/api/admin/registrations", adminAuth, async (req, res) => {
 app.post("/api/admin/registrations/:id/decision", adminAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { decision } = req.body; // "accepted" | "rejected"
-    if (!["accepted", "rejected"].includes(decision))
+    const { decision } = req.body;
+    if (!["Accepted", "Rejected"].includes(decision))
       return res.status(400).json({ ok: false, error: "Invalid decision" });
 
     const { rows } = await pool.query(`SELECT * FROM registrations WHERE id = $1`, [id]);
     if (!rows.length) return res.status(404).json({ ok: false, error: "Not found" });
     const reg = rows[0];
 
-    await pool.query(`UPDATE registrations SET status = $1, decision_sent = TRUE WHERE id = $2`, [decision, id]);
+    await pool.query(`UPDATE registrations SET review_status = $1, status = $2, decision_sent = TRUE WHERE id = $3`, [decision, decision.toLowerCase(), id]);
 
-    const emailContent = decision === "accepted" ? acceptanceEmail(reg) : rejectionEmail(reg);
+    const emailContent = decision === "Accepted" ? acceptanceEmail(reg) : rejectionEmail(reg);
     const emailResult = await sendEmail(reg.email, emailContent);
 
     res.json({ ok: true, decision, emailResult, emailContent });
@@ -254,6 +243,23 @@ app.post("/api/admin/registrations/:id/invoice", adminAuth, async (req, res) => 
   } catch (err) {
     console.error(err);
     res.status(500).json({ ok: false, error: "Failed to send invoice" });
+  }
+});
+
+app.post("/api/admin/registrations/:id/custom-email", adminAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { subject, message } = req.body ?? {};
+    const { rows } = await pool.query(`SELECT * FROM registrations WHERE id = $1`, [id]);
+    if (!rows.length) return res.status(404).json({ ok: false, error: "Not found" });
+    const reg = rows[0];
+    if (!subject || !message) return res.status(400).json({ ok: false, error: "Subject and message are required" });
+    const emailContent = customEmail({ name: reg.name, subject, message });
+    const emailResult = await sendEmail(reg.email, emailContent);
+    res.json({ ok: true, emailResult, emailContent });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: "Failed to send custom email" });
   }
 });
 
