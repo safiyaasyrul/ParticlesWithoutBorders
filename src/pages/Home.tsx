@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
+import klccBg from "@assets/PWB_BG_1777859070413.png";
 
 const logoUrl = "/logo.png";
-const klccBg = "/klcc-bg.png";
 const particlesPlusLogo = "/particles-plus-logo.png";
 const upmLogo = "/upm-logo.png";
 const northumbriaLogo = "/northumbria-logo.jpg";
@@ -216,8 +216,8 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden">
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${klccBg})` }} />
-      <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-white/75 via-transparent to-transparent" />
       <Particles />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center w-full">
         <div className="text-white fade-in">
@@ -239,14 +239,14 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
           </div>
         </div>
         <div className="relative flex justify-center items-center">
-          <div className="absolute inset-0 bg-gradient-radial from-white/60 via-white/20 to-transparent blur-3xl" />
-                        <div className="float-anim bg-white rounded-xl flex items-center justify-center p-4">
-                          <img   
-                        src={logoUrl} 
-                        alt="Particles Without Borders Logo"
-                            className="block max-w-[320px] w-full h-auto object-contain"
-                  />
-              </div>
+          <div className="absolute inset-0 bg-gradient-radial from-white/50 via-white/15 to-transparent blur-3xl" />
+          <div className="float-anim bg-white/95 rounded-[2rem] flex items-center justify-center p-6 shadow-2xl border border-white/60">
+            <img
+              src={logoUrl}
+              alt="Particles Without Borders Logo"
+              className="block max-w-[320px] w-full h-auto object-contain"
+            />
+          </div>
           </div>
         </div>
     
