@@ -216,26 +216,25 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden">
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${klccBg})` }} />
-      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-white/75 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/60 to-transparent" />
       <Particles />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center w-full">
-        <div className="text-white fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur border border-white/30 text-xs font-medium uppercase tracking-wider mb-6">
-            <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+        <div className="fade-in backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 border border-slate-200 text-slate-700 text-xs font-medium uppercase tracking-wider mb-6 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             16 November 2026 · KLCC, Kuala Lumpur
           </div>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-5 drop-shadow-lg">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-5 text-slate-900">
             Particles<br />
             <span className="bg-gradient-to-r from-emerald-300 to-cyan-200 bg-clip-text text-transparent">Without Borders</span>
           </h1>
-          <p className="text-xl sm:text-2xl font-light italic mb-4 text-cyan-50">Air Quality, Health &amp; Sustainable Solutions</p>
-          <p className="text-base sm:text-lg text-white/90 max-w-xl mb-8 leading-relaxed">
+          <p className="text-xl sm:text-2xl font-light italic mb-4 text-slate-700">Air Quality, Health &amp; Sustainable Solutions</p>
+          <p className="text-base sm:text-lg text-slate-600 max-w-xl mb-8 leading-relaxed">
             An international gathering of scientists, engineers and policymakers advancing the understanding of particles, emissions and sustainable solutions for cleaner air and healthier communities.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button onClick={() => onNav("registration")} className="px-7 py-3.5 rounded-full bg-white text-primary font-semibold shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all">Register Now</button>
-            <button onClick={() => onNav("registration")} className="px-7 py-3.5 rounded-full bg-emerald-500 text-white font-semibold shadow-xl hover:bg-emerald-400 hover:-translate-y-0.5 transition-all">Submit Abstract</button>
+            <button onClick={() => onNav("registration")} className="px-7 py-3.5 rounded-full bg-emerald-600 text-white font-semibold shadow-lg hover:bg-emerald-500 hover:-translate-y-0.5 transition-all">Register Now</button>
+            <button onClick={() => onNav("registration")} className="px-7 py-3.5 rounded-full border border-slate-300 text-slate-700 bg-white/80 font-semibold shadow-sm hover:bg-white hover:-translate-y-0.5 transition-all">Submit Abstract</button>
           </div>
         </div>
         <div className="relative flex justify-center items-center">
@@ -247,9 +246,8 @@ function Hero({ onNav }: { onNav: (id: string) => void }) {
               className="block max-w-[320px] w-full h-auto object-contain"
             />
           </div>
-          </div>
         </div>
-    
+      </div>
     </section>
   );
 }
