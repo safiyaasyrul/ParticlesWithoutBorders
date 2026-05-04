@@ -45,10 +45,7 @@ async function sendConfirmationEmail(to, name, registrationId, category) {
   if (!res.ok) {
     const err = await res.json();
     console.error("Email error:", err);
-    throw new Error("Failed to send email");
   }
-
-  return res.json();
 }
 
 app.post("/api/registrations", async (req, res) => {
@@ -57,7 +54,6 @@ app.post("/api/registrations", async (req, res) => {
     const { name, email, category } = req.body;
     console.log("New registration:", req.body);
 
-    // ✅ Email failure won't break registration
     try {
       await sendConfirmationEmail(email, name, id, category);
     } catch (emailErr) {
