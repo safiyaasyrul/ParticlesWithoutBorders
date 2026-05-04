@@ -851,7 +851,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen gradient-bg">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-cyan-50">
       <Header active={active} onNav={handleNav} />
       <main>
         <Hero onNav={handleNav} />
