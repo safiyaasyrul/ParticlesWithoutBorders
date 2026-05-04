@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import pg from "pg";
 import nodemailer from "nodemailer";
+import cors from "cors";
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -153,6 +154,7 @@ async function sendEmail(to, { subject, html }) {
 // ── Express app ───────────────────────────────────────────────────────────────
 
 const app = express();
+app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
 // ── Public: registration ──────────────────────────────────────────────────────
@@ -160,6 +162,7 @@ app.use(express.json({ limit: "1mb" }));
 app.post("/api/registrations", async (req, res) => {
   try {
     const b = req.body ?? {};
+    console.log("Incoming registration:", b);
     const id = "REG-" + Math.random().toString(36).slice(2, 10).toUpperCase();
     await pool.query(
       `INSERT INTO registrations
@@ -171,10 +174,10 @@ app.post("/api/registrations", async (req, res) => {
        b.keywords ?? "", b.dietary ?? "", b.visa ?? "", b.reviewer ?? "",
        b.paymentStatus ?? "Pending"]
     );
-    res.json({ ok: true, success: true, registration: { id }, id });
+    res.status(200).json({ success: true, id });
   } catch (err) {
     console.error("Registration error:", err);
-    res.status(500).json({ ok: false, error: "Registration failed. Please try again." });
+    res.status(500).json({ success: false, error: "Registration failed" });
   }
 });
 
