@@ -489,7 +489,13 @@ function RegistrationForm({ initCategory, initRole }: { initCategory: Category; 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+     let data;
+
+try {
+  data = await res.json();
+} catch {
+  throw new Error("Server did not return JSON");
+}
       if (!res.ok) throw new Error(data.error ?? "Registration failed");
       setSavedId(data.registration?.id ?? null);
       setSubmitted(true);
