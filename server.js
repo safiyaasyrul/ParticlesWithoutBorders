@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import pg from "pg";
@@ -153,6 +154,12 @@ async function sendEmail(to, { subject, html }) {
 // ── Express app ───────────────────────────────────────────────────────────────
 
 const app = express();
+app.use(cors({
+  origin: "https://particles-without-borders-5nhz-two.vercel.app",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json({ limit: "1mb" }));
 
 // ── Public: registration ──────────────────────────────────────────────────────
